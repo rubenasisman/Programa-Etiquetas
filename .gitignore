@@ -1,0 +1,17 @@
+# --- PyInstaller (Archivos de compilación) ---
+build/
+dist/
+*.spec
+
+# --- Python (Archivos temporales) ---
+__pycache__/
+*.py[cod]
+*$py.class
+
+# --- Entornos virtuales ---
+venv/
+env/
+
+# --- Sistema Operativo ---
+.DS_Store
+Thumbs.db

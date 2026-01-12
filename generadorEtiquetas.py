@@ -66,33 +66,32 @@ def procesar_etiquetas_pdf(ancho_mm, alto_mm):
         pdf.set_draw_color(230, 230, 230)
         pdf.rect(x_actual, y_actual, ancho_mm, alto_mm)
         
-        # --- TEXTO PRODUCTO (Tamaño 12) ---
+        # --- 1. TEXTO PRODUCTO (Tamaño 12) ---
         pdf.set_xy(x_actual + 2, y_actual + 3)
         pdf.set_font("helvetica", "", 12)
         producto = str(fila['Producto']).replace("€", chr(128))
-        pdf.multi_cell(ancho_mm - 4, 4, producto.encode('latin-1', 'replace').decode('latin-1'), align='L')
+        pdf.multi_cell(ancho_mm - 4, 5, producto.encode('latin-1', 'replace').decode('latin-1'), align='L')
         
-        # --- TEXTO PRECIO (Unificado y misma altura) ---
-        # Calculamos la posición vertical centrada según el alto de la etiqueta
-        offset_y = 12 if alto_mm == 30 else 20
+        # --- 2. PRECIO CENTRADO (Tamaño 20) ---
+        # Ajustamos el offset vertical según el alto de la etiqueta
+        offset_y_precio = 15 if alto_mm == 30 else 20
         
-        # Limpiamos el valor del precio
         precio_val = str(fila['Precio']).replace("€", "").strip()
         precio_final = f"{precio_val} {chr(128)}"
         
-        # Definimos el punto de inicio X para que el bloque conjunto parezca centrado
-        # Aproximadamente restamos 10mm del centro para compensar el texto P.V.P
-        pdf.set_xy(x_actual + (ancho_mm / 4), y_actual + offset_y)
+        pdf.set_font("helvetica", "B", 32)
+        pdf.set_xy(x_actual, y_actual + offset_y_precio)
+        # cell con ancho_mm y align='C' centra el texto en el ancho de la etiqueta
+        pdf.cell(ancho_mm, 10, precio_final.encode('latin-1', 'replace').decode('latin-1'), align='C')
         
-        # 1. Escribimos "P.V.P " (Tamaño 14)
+        # --- 3. TEXTO P.V.P DEBAJO A LA DERECHA (Tamaño 14) ---
         pdf.set_font("helvetica", "B", 12)
-        pdf.write(10, "P.V.P ".encode('latin-1', 'replace').decode('latin-1'))
+        # Se coloca unos milímetros más abajo del precio
+        pdf.set_xy(x_actual, y_actual + offset_y_precio + 8) 
+        # align='R' lo pega al borde derecho (con un margen de 2mm)
+        pdf.cell(ancho_mm - 2, 10, "P.V.P".encode('latin-1', 'replace').decode('latin-1'), align='R')
         
-        # 2. Escribimos el Valor (Tamaño 20) a continuación inmediata
-        pdf.set_font("helvetica", "B", 28)
-        pdf.write(10, precio_final.encode('latin-1', 'replace').decode('latin-1'))
-        
-        # --- LÓGICA DE POSICIONAMIENTO ---
+        # --- LÓGICA DE POSICIONAMIENTO DE CELDAS ---
         count_col += 1
         if count_col < columnas:
             x_actual += ancho_mm
@@ -115,7 +114,7 @@ def procesar_etiquetas_pdf(ancho_mm, alto_mm):
     except Exception as e:
         messagebox.showerror("Error al guardar", f"No se pudo crear el PDF:\n{e}")
 
-# --- INTERFAZ ---
+# --- INTERFAZ GRÁFICA ---
 root = tk.Tk()
 root.title("Asisman - Generador PDF Pro")
 root.geometry("450x450")
@@ -128,7 +127,7 @@ tk.Label(root, text="Compatible con Office 2003 y versiones modernas.",
 tk.Button(root, text="Formato 62x40mm (PDF)", width=35, height=2, command=lambda: procesar_etiquetas_pdf(62, 40)).pack(pady=10)
 tk.Button(root, text="Formato 62x30mm (PDF)", width=35, height=2, command=lambda: procesar_etiquetas_pdf(62, 30)).pack(pady=10)
 
-# Carga del logo desde la variable interna (Memoria)
+# Carga de logo desde la memoria
 try:
     img_data = base64.b64decode(LOGO_BASE64)
     img_open = Image.open(io.BytesIO(img_data))

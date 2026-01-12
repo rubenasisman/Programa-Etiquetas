@@ -85,11 +85,11 @@ def procesar_etiquetas_pdf(ancho_mm, alto_mm):
         pdf.set_xy(x_actual + (ancho_mm / 4), y_actual + offset_y)
         
         # 1. Escribimos "P.V.P " (Tamaño 14)
-        pdf.set_font("helvetica", "B", 14)
+        pdf.set_font("helvetica", "B", 12)
         pdf.write(10, "P.V.P ".encode('latin-1', 'replace').decode('latin-1'))
         
         # 2. Escribimos el Valor (Tamaño 20) a continuación inmediata
-        pdf.set_font("helvetica", "B", 20)
+        pdf.set_font("helvetica", "B", 28)
         pdf.write(10, precio_final.encode('latin-1', 'replace').decode('latin-1'))
         
         # --- LÓGICA DE POSICIONAMIENTO ---
